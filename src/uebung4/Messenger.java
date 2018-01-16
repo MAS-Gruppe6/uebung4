@@ -90,6 +90,7 @@ public class Messenger implements Agent {
 			if (client != null) {
 				MessageCenter.singleton.send(this.id, MessageCenter.singleton.initiator.getId(),
 						FIPA_Performative.INFORM, "inform-done");
+				currentTarget = null;
 			} else {
 				canGo = false;
 			}

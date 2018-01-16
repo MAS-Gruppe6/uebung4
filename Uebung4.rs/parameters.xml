@@ -7,9 +7,15 @@
 									
 		/>
 				<parameter name="numOfDays" displayName="Number of Days" type="int" 
-						defaultValue="10" 
+						defaultValue="100000" 
 						isReadOnly="false" 
 						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
+									
+		/>
+				<parameter name="trustMod" displayName="trustMod" type="double" 
+						defaultValue="1.05" 
+						isReadOnly="false" 
+						converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
 									
 		/>
 		</parameters>

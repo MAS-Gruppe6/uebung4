@@ -43,6 +43,7 @@ public class AgentBuilder implements ContextBuilder<Object> {
 
 		Initiator initiator = new Initiator(clients, messengers, space, grid);
 		msgCenter.addAgent(initiator);
+		context.add(initiator);
 
 		for (Messenger messenger : messengers) {
 			context.add(messenger);

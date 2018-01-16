@@ -55,7 +55,6 @@ public class Initiator implements Agent {
 
 	@ScheduledMethod(start = 1, interval = 1)
 	public void run() {
-
 		if (!isIdle) {
 			HashMap<Client, Messenger> agentRelations = new HashMap<>();
 			for (Client client : clients) {
@@ -63,7 +62,8 @@ public class Initiator implements Agent {
 				Messenger bestAgent = null;
 				for (Messenger messenger : messengers) {
 					double dist = grid.getDistance(grid.getLocation(client), grid.getLocation(messenger));
-					dist = dist * (1.0 - trustValues.get(messenger));
+					Parameters params = RunEnvironment.getInstance().getParameters();
+					dist = dist * (1.0 - (trustValues.get(messenger) / params.getDouble("trustMod")));
 					if (dist < bestDistance) {
 						bestDistance = dist;
 						bestAgent = messenger;
