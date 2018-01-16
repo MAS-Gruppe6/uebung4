@@ -10,10 +10,6 @@ import repast.simphony.space.grid.Grid;
 
 public class Messenger implements Agent {
 
-	public enum Status {
-		IDLE, PROPOSING, WORKING
-	}
-
 	private ContinuousSpace<Object> space;
 
 	private Grid<Object> grid;

@@ -1,16 +1,10 @@
 package uebung4;
 
-import java.util.ArrayList;
-
 import repast.simphony.space.continuous.ContinuousSpace;
 import repast.simphony.space.continuous.NdPoint;
 import repast.simphony.space.grid.Grid;
 
 public class Client implements Agent {
-
-	public enum Status {
-		IDLE, REQUESTING, WAITING
-	}
 
 	private int id;
 	private NdPoint startingPoint;
@@ -18,19 +12,12 @@ public class Client implements Agent {
 	private ContinuousSpace<Object> space;
 
 	private Grid<Object> grid;
-	private Status status;
-
-	private ArrayList<Agent> messengerProposals;
-	private int refused;
 
 	public Client(NdPoint start, ContinuousSpace<Object> space, Grid<Object> grid) {
 		this.space = space;
 		this.grid = grid;
 		startingPoint = start;
 		id = -1;
-		status = Status.IDLE;
-		messengerProposals = new ArrayList<>();
-		refused = 0;
 	}
 
 	@Override

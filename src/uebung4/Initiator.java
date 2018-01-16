@@ -94,8 +94,9 @@ public class Initiator implements Agent {
 			}
 
 			if (checkForNewDay() && !msgCenter.messagesAvailable(this.id)) {
-				if (remainingDays-- > 0) {
+				if (remainingDays > 0) {
 					isIdle = false;
+					remainingDays--;
 				}
 			}
 		}
@@ -109,6 +110,10 @@ public class Initiator implements Agent {
 			}
 		}
 		return true;
+	}
+
+	public int getDay() {
+		return remainingDays;
 	}
 
 	public void calcTrustValue(boolean success, Messenger m) {
