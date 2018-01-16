@@ -41,6 +41,9 @@ public class AgentBuilder implements ContextBuilder<Object> {
 
 		MessageCenter msgCenter = MessageCenter.singleton;
 
+		Initiator initiator = new Initiator(clients, messengers, space, grid);
+		msgCenter.addAgent(initiator);
+
 		for (Messenger messenger : messengers) {
 			context.add(messenger);
 			space.moveTo(messenger, messenger.getStartX(), messenger.getStartY());

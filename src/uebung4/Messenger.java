@@ -1,5 +1,7 @@
 package uebung4;
 
+import java.util.ArrayList;
+
 import repast.simphony.engine.schedule.ScheduledMethod;
 import repast.simphony.space.SpatialMath;
 import repast.simphony.space.continuous.ContinuousSpace;
@@ -18,18 +20,23 @@ public class Messenger implements Agent {
 
 	private NdPoint startingPoint;
 	private int id;
-	private Status status;
-	private int numProposals;
-	private int acceptedClient;
+
+	private ArrayList<Client> targets;
+	private Client currentTarget;
+
+	public boolean canGo;
+
+	public int numOfDeliveries;
 
 	public Messenger(NdPoint start, ContinuousSpace<Object> space, Grid<Object> grid) {
 		this.space = space;
 		this.grid = grid;
 		startingPoint = start;
 		id = -1;
-		acceptedClient = -1;
-		status = Status.IDLE;
-		numProposals = 0;
+		targets = new ArrayList<>();
+		canGo = false;
+		currentTarget = null;
+		numOfDeliveries = 100;
 	}
 
 	@Override
@@ -47,57 +54,51 @@ public class Messenger implements Agent {
 		return startingPoint;
 	}
 
+	public void go(boolean val) {
+		canGo = val;
+	}
+
 	@ScheduledMethod(start = 1, interval = 1)
 	public void run() {
 		MessageCenter msgCenter = MessageCenter.singleton;
 
-		FIPA_Message msg = msgCenter.getMessage(this.id);
-		if (this.status == Status.PROPOSING) {
-			if (msg != null && msg.getContent().equals("reject-proposal")) {
-				if (--numProposals == 0) {
-					this.status = Status.IDLE;
-					return;
+		if (canGo) {
+			if (currentTarget == null) {
+				if (!targets.isEmpty()) {
+					currentTarget = targets.remove(0);
 				}
-			} else if (msg != null && msg.getContent().equals("accept-proposal")) {
-				numProposals = 0;
-				acceptedClient = msg.getSender();
-				this.status = Status.WORKING;
-				return;
 			}
+			work(currentTarget);
 		}
-
-		if (this.status == Status.WORKING) {
-			if (msg != null && msg.getContent().equals("cfp")) {
-				msgCenter.send(this.id, msg.getSender(), FIPA_Performative.INFORM, "refuse");
-			}
-			if (msg != null && msg.getContent().equals("accept-proposal")) {
-				msgCenter.send(this.id, msg.getSender(), FIPA_Performative.INFORM, "failure");
-			}
-			work(msgCenter.getAgent(acceptedClient));
-		}
-
-		if (msg != null && msg.getContent().equals("cfp") && this.status != Status.WORKING) {
-			msgCenter.send(this.id, msg.getSender(), FIPA_Performative.REQUEST, "propose");
-			this.status = Status.PROPOSING;
-			this.numProposals++;
-		}
-
 	}
 
 	private void work(Agent client) {
 		NdPoint myPoint = space.getLocation(this);
-		NdPoint otherPoint = new NdPoint(client.getStartX(), client.getStartY());
+		NdPoint otherPoint;
+		if (client == null) {
+			otherPoint = new NdPoint(this.getStartX(), this.getStartY());
+		} else {
+			otherPoint = new NdPoint(client.getStartX(), client.getStartY());
+		}
 		double angle = SpatialMath.calcAngleFor2DMovement(space, myPoint, otherPoint);
 		// Ein Feld pro Tick bewegen
 		space.moveByVector(this, 1, angle, 0);
 		myPoint = space.getLocation(this);
 		grid.moveTo(this, (int) myPoint.getX(), (int) myPoint.getY());
 
-		if (grid.getDistance(grid.getLocation(this), grid.getLocation(client)) <= 1) {
-			this.status = Status.IDLE;
-			acceptedClient = -1;
-			MessageCenter.singleton.send(this.id, client.getId(), FIPA_Performative.INFORM, "inform-done");
+		if (space.getDistance(space.getLocation(this), otherPoint) <= 1) {
+			if (client != null) {
+				MessageCenter.singleton.send(this.id, MessageCenter.singleton.initiator.getId(),
+						FIPA_Performative.INFORM, "inform-done");
+			} else {
+				canGo = false;
+			}
+
 		}
+	}
+
+	public void addTarget(Client t) {
+		targets.add(t);
 	}
 
 	@Override

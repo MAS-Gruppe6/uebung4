@@ -7,6 +7,7 @@ public class MessageCenter {
 
 	ArrayList<FIPA_Message> messageList;
 	HashMap<Integer, Agent> agents;
+	public Initiator initiator;
 
 	public int numberOfAgents;
 	public int numberOfMessengers;
@@ -19,6 +20,7 @@ public class MessageCenter {
 		this.messageList = new ArrayList<FIPA_Message>();
 		this.agents = new HashMap<>();
 		this.numberOfAgents = 0;
+		initiator = null;
 	}
 
 	public void requestPackage(Client c) {
@@ -39,8 +41,10 @@ public class MessageCenter {
 		this.agents.put(numberOfAgents++, a);
 		if (a instanceof Messenger) {
 			numberOfMessengers++;
-		} else {
+		} else if (a instanceof Client) {
 			numberOfClients++;
+		} else {
+			initiator = (Initiator) a;
 		}
 	}
 
